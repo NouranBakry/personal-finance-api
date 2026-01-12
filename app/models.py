@@ -4,11 +4,11 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Numeric, B
 from sqlalchemy.orm import relationship
 from .database import Base  # Import the Base from your database module
 import uuid
-
+from datetime import datetime
 
 class TimestampMixin:
-    created_at = Column(DateTime, default=DateTime.now)
-    updated_at = Column(DateTime, default=DateTime.now, onupdate=DateTime.now)
+    created_at = Column(DateTime, default=datetime.now())
+    updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
     is_active = Column(Boolean, default=True)
 
 class User (Base, TimestampMixin):
@@ -43,6 +43,6 @@ class Transaction (Base):
     amount = Column(Numeric(precision=18, scale=2))
 
     account_id = Column(Integer, ForeignKey("accounts.id"))  # Link to Account
-    created_at = Column(DateTime, default=DateTime.now)
+    created_at = Column(DateTime, default=datetime.now())
 
     account = relationship("Account", back_populates="transactions")

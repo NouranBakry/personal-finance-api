@@ -12,6 +12,11 @@ class AccountRepository:
         result = self.db.execute(query)
         return result.scalars().first()
 
+    def get_all_by_user(self, user_id: int):
+        # Audit-Ready: Only fetch accounts belonging to THIS user
+        query = select(Account).where(Account.user_id == user_id)
+        return self.db.execute(query).scalars().all()
+    
     def create(self, account_model: Account):
         self.db.add(account_model)
         self.db.commit()

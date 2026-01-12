@@ -4,7 +4,8 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 from app.models import User
 from app.repositories.user_repo import UserRepository
-from app.services.user_service import UserService, AuthService
+from app.services.user_service import UserService
+from app.services.auth_service import AuthService
 from app.schemas import UserCreate, UserRead
 
 

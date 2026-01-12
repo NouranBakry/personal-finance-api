@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session, sessionmaker, declarative_base
-from .database import SessionLocal  # This is your session factory
 from sqlalchemy import create_engine
 
 DATABASE_URL = "postgresql://user:password@localhost:5432/finance_db"
