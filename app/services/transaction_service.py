@@ -1,6 +1,8 @@
 from decimal import Decimal
 from fastapi import HTTPException
 from app.models import Account, Transaction
+from datetime import datetime
+from sqlalchemy import func, extract
 
 class TransactionService:
     def __init__(self, db):
@@ -33,3 +35,37 @@ class TransactionService:
     def delete_transaction(self, transaction_id):
         # Logic to delete a transaction from the database
         pass
+    
+    def get_monthly_summary(self, user_id: int):
+        now = datetime.utcnow()
+        
+        total_balance = self.db.query(func.sum(Account.balance))\
+            .filter(Account.user_id == user_id).scalar() or 0
+            
+        # sum of positive transactions for the current month    
+        monthly_income = self.db.query(func.sum(Transaction.amount))\
+            .join(Account)\
+            .filter(
+            Account.user_id == user_id,
+            Transaction.amount > 0,
+            extract('month', Transaction.created_at) == now.month,
+            extract('year', Transaction.created_at) == now.year
+        ).scalar() or 0
+
+        # sum of negative transactions for the current month
+        monthly_expenses = self.db.query(func.sum(Transaction.amount))\
+            .join(Account)\
+            .filter(
+            Account.user_id == user_id,
+            Transaction.amount < 0,
+            extract('month', Transaction.created_at) == now.month,
+            extract('year', Transaction.created_at) == now.year
+        ).scalar() or 0
+            
+        return {
+            "total_balance": total_balance,
+            "monthly_income": monthly_income,
+            # Show as positive number
+            "monthly_expenses": abs(monthly_expenses),
+            "net_savings": monthly_income + monthly_expenses
+        }

@@ -49,3 +49,9 @@ class TokenData(BaseModel):
     username: Optional[str] = None
     class Config:
         from_attributes = True  # This allows Pydantic to read SQLAlchemy objects
+        
+class MonthlySummary(BaseModel):
+    total_balance: Decimal
+    monthly_income: Decimal
+    monthly_expenses: Decimal
+    net_savings: Decimal

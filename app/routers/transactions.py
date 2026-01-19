@@ -16,3 +16,8 @@ def create_transaction(transactionData: TransactionCreate, db: Session = Depends
     service = TransactionService(db)
     return service.create_transaction(account_id=transactionData.account_id, user_id=current_user.id, amount=transactionData.amount,description=transactionData.description)
     
+@router.get("/monthly-summary")   
+def get_monthly_summary(db: Session = Depends(get_db),     
+                       current_user: User = Depends(read_users_me)):
+    service = TransactionService(db)
+    return service.get_monthly_summary(user_id=current_user.id)
