@@ -1,4 +1,3 @@
-from passlib.context import CryptContext
 from app.repositories.user_repo import UserRepository
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
@@ -6,9 +5,9 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException
 from app.database import get_db
 from sqlalchemy.orm import Session
+from pwdlib import PasswordHash
 
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+password_hash = PasswordHash.recommended()
 SECRET_KEY = "super-secret-audit-ready-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -17,11 +16,16 @@ class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    def authenticate(self, email: str, password: str) -> bool:
+    def authenticate(self, email: str, password: str):
         user = self.user_repo.get_by_email(email)
+        
         if not user:
-            return False
-        return pwd_context.verify(password, user.hashed_password)
+            return None
+        
+        if not password_hash.verify(password, user.hashed_password):
+            return None
+
+        return user
 
     def create_access_token(self, data: dict):
         to_encode = data.copy()
@@ -31,7 +35,9 @@ class AuthService:
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
-    def get_current_user(self, token=Depends(oauth2_scheme), db: Session = Depends(get_db)):
+
+    @staticmethod
+    def get_current_user(token=Depends(oauth2_scheme), db: Session = Depends(get_db)):
         credentials_exception = HTTPException(
             status_code=401,
             detail="Could not validate credentials",

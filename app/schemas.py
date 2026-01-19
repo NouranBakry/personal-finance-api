@@ -16,21 +16,22 @@ class UserRead(UserBase):
     created_at: datetime
     username: str
     
-
-class Config:
-    from_attributes = True  # This allows Pydantic to read SQLAlchemy objects
+    class Config:
+        from_attributes = True  # This allows Pydantic to read SQLAlchemy objects
     
 class AccountCreate(BaseModel):
     name: str
     initial_balance: Decimal = 0.0
     
 class AccountRead(BaseModel):
-    uuid: str
+    id: str
     name: str
     balance: Decimal
-    created_at: datetime
     owner_id: int
-    
+
+    class Config:
+        from_attributes = True
+        
 class TransactionCreate(BaseModel):
     amount: Decimal
     account_uuid: str

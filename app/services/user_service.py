@@ -1,15 +1,15 @@
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
 from app.repositories.user_repo import UserRepository
 from app.models import User
 from app.schemas import UserCreate
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+password_hash = PasswordHash.recommended()
 class UserService: 
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
         
     def hash_password(self, password: str) -> str:
-        return pwd_context.hash(password)
+        return password_hash.hash(password)
     
     def register_user(self, userData: UserCreate):
         

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session, sessionmaker, declarative_base
 from sqlalchemy import create_engine
+from app.config import settings  # Import your new settings
 
-DATABASE_URL = "postgresql://user:password@localhost:5432/finance_db"
-
+DATABASE_URL = settings.DATABASE_URL
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

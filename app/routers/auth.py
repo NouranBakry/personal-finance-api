@@ -7,16 +7,18 @@ from app.repositories.user_repo import UserRepository
 from app.services.user_service import UserService
 from app.services.auth_service import AuthService
 from app.schemas import UserCreate, UserRead
+from pwdlib import PasswordHash
 
+password_hash = PasswordHash.recommended()
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-def get_user_service(db: Session = Depends(get_db)):
+def get_service(db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
-    return UserService(user_repo)
+    return AuthService(user_repo)
 
 @router.post("/register")
-def register_user(userData: UserCreate, service: UserService = Depends(get_user_service)):
+def register_user(userData: UserCreate, service: AuthService = Depends(get_service)):
     try:
         return service.register_user(userData)
     except Exception as e:
@@ -26,10 +28,10 @@ def register_user(userData: UserCreate, service: UserService = Depends(get_user_
 def login(form_data: OAuth2PasswordRequestForm = Depends(),
           db: Session = Depends(get_db)):
     repo = UserRepository(db)
-    service = UserService(repo)
+    service = AuthService(repo)
+    user = service.authenticate(form_data.username, form_data.password)
     
-    user = repo.get_by_email(form_data.username)
-    if not user or not service.verify_password(form_data.password, user.hashed_password):
+    if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials", headers={"WWW-Authenticate": "Bearer"},)
     
     access_token = service.create_access_token(data={"sub": user.email})
