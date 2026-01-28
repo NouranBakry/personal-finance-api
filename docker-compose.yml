@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
@@ -7,11 +5,16 @@ services:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=finance_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
-volumes:
-  postgres_data:
+  web:  
+    build: .
+    ports: ["8000:8000"]
+    volumes:
+      - .:/app
+    env_file: .env
+    depends_on:
+      - db
+    command: tail -f /dev/null
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/finance_db
   

@@ -2,13 +2,13 @@ from decimal import Decimal
 import uuid
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Numeric, Boolean
 from sqlalchemy.orm import relationship
-from .database import Base  # Import the Base from your database module
+from .base import Base
 import uuid
 from datetime import datetime
 
 class TimestampMixin:
-    created_at = Column(DateTime, default=datetime.now())
-    updated_at = Column(DateTime, default=datetime.now(), onupdate=datetime.now())
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now())
     is_active = Column(Boolean, default=True)
 
 class User (Base, TimestampMixin):

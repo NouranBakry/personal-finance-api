@@ -64,3 +64,5 @@ python-jose[cryptography]
 pydantic-settings
 python-multipart
 psycopg2-binary
+pwdlib[argon2]
+alembic
